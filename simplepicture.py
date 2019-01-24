@@ -16,7 +16,7 @@ def sampleimage():
 if __name__ == "__main__":
     #draw = ImageDraw.Draw(im) # This might be used to create a canvas :)
 
-    im = Image.new("RGB", (width, height), "white");
+    im = Image.new("RGB", (width, height), "white")
 
     for coords, pixel in zip(product(range(width), range(height)), sampleimage()):
         im.putpixel(coords, pixel)
