@@ -9,11 +9,12 @@ width = 900
 max_t = 2*math.pi
 
 amplitude = 400
-x_max = amplitude
-y_max = amplitude
+x_max = width * 0.45
+y_max = height * 0.45
 
-freq_x = 30
-freq_y = 40
+
+freq_x = 3
+freq_y = 4
 
 phase_0 = math.pi
 d_phase = math.pi/16
