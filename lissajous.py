@@ -55,14 +55,20 @@ def draw(canvas, x, y, t):
     if not t > max_t:
         draw(canvas, new_x, new_y, t + 0.02)
 
+def colors():
+    """ Makes a 0-255 ranged RGB color from a HSL one. """
+    for i in count(0, 0.02):
+        r, g, b = Color(hue=i, saturation=1, luminance=0.5).rgb
+        yield (int(255*r), int(255*g), int(255*b))
+
 if __name__ == "__main__":
     
     im = Image.new("RGB", (width, height), "black")
-    canvas = ImageDraw.Draw(im)
-    
+    canvas = ImageDraw.Draw(im)    
 
+    color = colors()
     coords = coordinates(freq_x, x_max, phase_0, freq_y, y_max, phase_0 + d_phase, width, height)
     for old, new in coords:
-        canvas.line([old, new], "white", 1)
+        canvas.line([old, new], next(color), 1)
 
     im.save("lissajous.png")
