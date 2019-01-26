@@ -4,14 +4,15 @@ from itertools import tee, repeat, takewhile, count
 from colour import Color
 
 
-height = 900
-width = 900
+height = 2000
+width = 2000
 max_t = 2*math.pi
 
 amplitude = 400
 x_max = width * 0.45
 y_max = height * 0.45
 
+line_width = int(math.log10(height))
 
 freq_x = 3
 freq_y = 4
@@ -70,6 +71,6 @@ if __name__ == "__main__":
     color = colors()
     coords = coordinates(freq_x, x_max, phase_0, freq_y, y_max, phase_0 + d_phase, width, height)
     for old, new in coords:
-        canvas.line([old, new], next(color), 1)
+        canvas.line([old, new], next(color), line_width)
 
     im.save("lissajous.png")
