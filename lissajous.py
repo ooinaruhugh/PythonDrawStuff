@@ -49,6 +49,6 @@ if __name__ == "__main__":
     canvas = ImageDraw.Draw(im)    
 
     coords = coordinates(freq_x, x_max, phase_0, freq_y, y_max, phase_0 + d_phase, width, height)
-    continuous.drawcontinuous(canvas, coords, continuous.hsl_gradient(), line_width)
+    continuous.drawContinuous(canvas, coords, continuous.hslGradient(), line_width)
 
     im.save("lissajous.png")
