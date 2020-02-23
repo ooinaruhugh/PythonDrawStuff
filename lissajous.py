@@ -3,6 +3,7 @@ import math
 from itertools import repeat, takewhile, count
 import continuous
 
+step = 0.001
 
 height = 2000
 width = 2000
@@ -24,19 +25,19 @@ def value(t, frequency, amplitude, phase):
     """ This is basically just a sine function. """
     return amplitude * math.sin(frequency * t + phase)
 
-def coordinates(freq_x, x_max, x_phase, freq_y, y_max, y_phase, width, height):
+def coordinates(freq_x, x_max, x_phase, freq_y, y_max, y_phase, width, height, step=0.02):
     """ 
     Creates an iterator that returns some xy-Coordinates. 
     """
 
-    def ordinate(frequency, amplitude, phase):
+    def ordinate(frequency, amplitude, phase, step=0.02):
         """ Calculates the values for x and y. """
-        t = takewhile(lambda x : x <= 2 * math.pi, count(0, 0.02))
+        t = takewhile(lambda x : x <= 2 * math.pi, count(0, step))
         coords = map(value, t, repeat(frequency), repeat(amplitude), repeat(phase))
         return map(lambda x : x + width / 2, coords)
 
-    x = ordinate(freq_x, x_max, x_phase)
-    y = ordinate(freq_y, y_max, y_phase)
+    x = ordinate(freq_x, x_max, x_phase, step)
+    y = ordinate(freq_y, y_max, y_phase, step)
     return zip(x, y)
 
 
@@ -48,7 +49,7 @@ if __name__ == "__main__":
     im = Image.new("RGB", (width, height), "black")
     canvas = ImageDraw.Draw(im)    
 
-    coords = coordinates(freq_x, x_max, phase_0, freq_y, y_max, phase_0 + d_phase, width, height)
-    continuous.drawContinuous(canvas, coords, continuous.hslGradient(), line_width)
+    coords = coordinates(freq_x, x_max, phase_0, freq_y, y_max, phase_0 + d_phase, width, height, step)
+    continuous.drawContinuous(canvas, coords, continuous.hslGradient(step), line_width)
 
     im.save("lissajous.png")
