@@ -14,7 +14,7 @@ y_max = height * 0.45
 
 line_width = int(math.log10(height))
 
-freq_x = 2
+freq_x = 11
 freq_y = 6
 
 phase_0 = math.pi
