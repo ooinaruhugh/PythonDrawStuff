@@ -1,5 +1,9 @@
 from itertools import product
 
+def linspace(start, stop, res):
+    for k in range(res):
+        yield start + (stop - start) / (res - 1) * k
+
 def plane(width, height):
     return product(range(width), range(height))
 

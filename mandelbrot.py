@@ -2,6 +2,7 @@ from typing import Tuple
 from PIL import Image, ImageDraw
 from itertools import tee, repeat
 from pointplot import linspace
+from tqdm import tqdm
 import math
 
 def mandelbrot(c: Tuple[int, int], idepth: int, sup=2):
@@ -29,8 +30,8 @@ def generateMandelbrot(xMin, xMax, yMin, yMax, xRes, yRes):
             yield (mandelbrot((x, y), iteration_depth), i, j)
 
 iteration_depth = 50
-width = 1200
-height = 1400
+width = 12000
+height = 12000
 
 def normalize(plane, width, height):
     """
@@ -47,7 +48,7 @@ if __name__ == "__main__":
     im = Image.new("RGB", (width, height), "black")
     canvas = ImageDraw.Draw(im)
 
-    for pixel, x, y in generateMandelbrot(-2.5, 1.5, -2.5, 1, width, height):
+    for pixel, x, y in tqdm(generateMandelbrot(-2.5, 1.25, -1.75, 1.75, width, height), total=width*height):
         grayscaleValue = 255 // (pixel if pixel else 1)
         im.putpixel((x,y), (grayscaleValue, grayscaleValue, grayscaleValue))
 
