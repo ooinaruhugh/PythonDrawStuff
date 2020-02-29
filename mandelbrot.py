@@ -29,8 +29,8 @@ def generateMandelbrot(xMin, xMax, yMin, yMax, xRes, yRes):
             yield (mandelbrot((x, y), iteration_depth), i, j)
 
 iteration_depth = 50
-width = 500
-height = 500
+width = 1200
+height = 1400
 
 def normalize(plane, width, height):
     """
@@ -47,10 +47,7 @@ if __name__ == "__main__":
     im = Image.new("RGB", (width, height), "black")
     canvas = ImageDraw.Draw(im)
 
-    for pixel, x, y in generateMandelbrot(-2.5, 1.5, -2.5, 1.5, width, height):
-
-        iteration, argument = pixel
-
+    for pixel, x, y in generateMandelbrot(-2.5, 1.5, -2.5, 1, width, height):
         grayscaleValue = 255 // (pixel if pixel else 1)
         im.putpixel((x,y), (grayscaleValue, grayscaleValue, grayscaleValue))
 
