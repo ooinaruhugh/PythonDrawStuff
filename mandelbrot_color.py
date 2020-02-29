@@ -42,15 +42,15 @@ def rgbPixel(rgb: Color):
     return r,g,b
 
 iteration_depth = 50
-width = 10
-height = 10
+width = 2500
+height = 2500
 
 if __name__ == "__main__":
     im = Image.new("RGB", (width, height), "black")
     canvas = ImageDraw.Draw(im)
 
-    for pixel, x, y in tqdm(generateMandelbrot(-.85, -.75, 0.1, 0.3, width, height), total=width*height):
+    for pixel, x, y in tqdm(generateMandelbrot(-2.5, 1.25, -1.75, 1.75, width, height), total=width*height):
         iteration, argument = pixel
         im.putpixel((x,y), rgbPixel(Color(hue=argument, saturation=1, luminance=0.5*iteration)))
 
-    im.save("neuMandelbrot_clored.png")
+    im.save("technicolorMandelbrot.png")
