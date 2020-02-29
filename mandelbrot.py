@@ -1,7 +1,7 @@
 from typing import Tuple
 from PIL import Image, ImageDraw
 from itertools import tee, repeat
-import pointplot
+from pointplot import linspace
 import math
 
 def mandelbrot(c: Tuple[int, int], idepth: int, sup=2):
@@ -20,8 +20,17 @@ def mandelbrot(c: Tuple[int, int], idepth: int, sup=2):
             return idepth-i
     return 1
 
+def generateMandelbrot(xMin, xMax, yMin, yMax, xRes, yRes):
+    X = linspace(xMin, xMax, xRes)
+    Y = linspace(yMin, yMax, yRes)
+
+    for j, y in enumerate(Y):
+        for i, x in enumerate(linspace(xMin, xMax, xRes)):
+            yield (mandelbrot((x, y), iteration_depth), i, j)
+
 iteration_depth = 50
-canvas_size = 5000
+width = 500
+height = 500
 
 def normalize(plane, width, height):
     """
@@ -35,16 +44,14 @@ def normalizePoint(point: Tuple[int, int], xMax, yMax):
 
 
 if __name__ == "__main__":
-    im = Image.new("RGB", (canvas_size, canvas_size), "black")
+    im = Image.new("RGB", (width, height), "black")
     canvas = ImageDraw.Draw(im)
 
-    # A grid of coordinates (as integer values)
-    plane = pointplot.plane(canvas_size, canvas_size)
+    for pixel, x, y in generateMandelbrot(-2.5, 1.5, -2.5, 1.5, width, height):
 
-    for z in plane:
-        # circle doesn't consist of integer values anymore, so we need to convert them
-        result = mandelbrot(normalizePoint(z, canvas_size, canvas_size), iteration_depth)
-        grayscale_value = 255 // (result if result else 1)
-        im.putpixel(z, (grayscale_value, grayscale_value, grayscale_value))
+        iteration, argument = pixel
+
+        grayscaleValue = 255 // (pixel if pixel else 1)
+        im.putpixel((x,y), (grayscaleValue, grayscaleValue, grayscaleValue))
 
     im.save("mandelbrot.png")
