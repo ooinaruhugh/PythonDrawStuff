@@ -1,9 +1,11 @@
 from typing import Tuple
-from PIL import Image, ImageDraw
 from itertools import tee, repeat
-from pointplot import linspace
-from tqdm import tqdm
 import math
+
+from pointplot import linspace
+
+from PIL import Image, ImageDraw
+from tqdm import tqdm
 
 def mandelbrot(c: Tuple[int, int], idepth: int, sup=2):
     ''' 
@@ -26,7 +28,7 @@ def generateMandelbrot(xMin, xMax, yMin, yMax, xRes, yRes):
     Y = linspace(yMin, yMax, yRes)
 
     for j, y in enumerate(Y):
-        for i, x in enumerate(linspace(xMin, xMax, xRes)):
+        for i, x in enumerate(X):
             yield (mandelbrot((x, y), iteration_depth), i, j)
 
 iteration_depth = 50

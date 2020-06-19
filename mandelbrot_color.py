@@ -1,56 +1,103 @@
-from pointplot import linspace
-from PIL import Image, ImageDraw
+from typing import Tuple
 from itertools import tee, product
 from math import atan2
+import argparse
+from functools import partial
 
+from colorsys import hls_to_rgb
+
+from pointplot import linspace
+
+from PIL import Image, ImageDraw
 from tqdm import tqdm
 from colour import Color
 
-from typing import Tuple
-
-
-def technicolorMandelbrot(c: Tuple[int, int], idepth: int, sup=2):
+def mandelbrot(c: complex, idepth: int, sup=2) -> complex:
     ''' 
         Tests whether a given point c is in the Mandelbrot set,
         i.e. whether (or how fast) the sequence x_n=x²_(n-1)+c diverges
         
-        Returns 1 and the argument of z if c is in the set 
+        Returns z if c is in the set 
         and 0 if not
     '''
+
+    z = 0+0j
+
+    for i in range(0, idepth):
+        z = z**2 + c
+        if abs(z) > sup:
+            return 0+0j
+    return z
+
+def altMandelbrot(c: Tuple[int, int], idepth: int, sup=2) -> Tuple[int, int]:
+    ''' 
+        Tests whether a given point c is in the Mandelbrot set,
+        i.e. whether (or how fast) the sequence x_n=x²_(n-1)+c diverges
+        
+        Returns z if c is in the set 
+        and 0 if not
+    '''
+
     cx, cy = c
     zx, zy = (0,0)
 
     for i in range(0, idepth):
         zx, zy = (zx*zx - zy*zy + cx, 2*zx*zy+cy)
         if zx*zx+zy*zy > sup*sup:
-            return 0, 0
-    return 1, atan2(zy, zx)
+            return (0, 0)
+    return (zx, zy)
 
-def generateMandelbrot(xMin, xMax, yMin, yMax, xRes, yRes):
-    X = linspace(xMin, xMax, xRes)
-    Y = linspace(yMin, yMax, yRes)
+def computePicture(X, Y, f):
+    for (i, x),(j, y) in tqdm(product(enumerate(X),enumerate(Y))):
+        yield (f((x, y)), i, j)
+        # yield (f(x+y*1j), i, j)
 
-    for j, y in enumerate(Y):
-        for i, x in enumerate(linspace(xMin, xMax, xRes)):
-            yield (technicolorMandelbrot((x, y), iteration_depth), i, j)
+def mandelColor(pixel):
+    x, y = pixel
 
-def rgbPixel(rgb: Color):
-    r = int(rgb.get_red() * 255)
-    g = int(rgb.get_green() * 255)
-    b = int(rgb.get_blue() * 255)
+    h = atan2(y, x)
+    s = 1
+    l = 0.5*(not x+y == 0)
 
-    return r,g,b
+    r,g,b = hls_to_rgb(h, l, s)
 
-iteration_depth = 50
-width = 2500
-height = 2500
+    return int(r*255), int(g*255), int(b*255)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generates a colorized Mandelbrot image")
+    parser.add_argument("--width", default=2500, type=int)
+    parser.add_argument("--height", default=2500, type=int)
+    parser.add_argument("--iDepth", default=50, type=int,
+        help="Maximum number of iterations for one point")
+    parser.add_argument("--xMin", default=-2.5, type=float)
+    parser.add_argument("--xMax", default=1.25, type=float)
+    parser.add_argument("--yMin", default=-1.75, type=float)
+    parser.add_argument("--yMax", default=1.75, type=float)
+
+    args = parser.parse_args()
+
+    iteration_depth = args.iDepth
+    width = args.width
+    height = args.height
+
+    xMin = args.xMin
+    xMax = args.xMax
+    yMin = args.yMin
+    yMax = args.yMax
+
+    # Discretize domain into pixels
+    X = linspace(xMin, xMax, width) 
+    Y = linspace(yMin, yMax, height)
+
     im = Image.new("RGB", (width, height), "black")
     canvas = ImageDraw.Draw(im)
 
-    for pixel, x, y in tqdm(generateMandelbrot(-2.5, 1.25, -1.75, 1.75, width, height), total=width*height):
-        iteration, argument = pixel
-        im.putpixel((x,y), rgbPixel(Color(hue=argument, saturation=1, luminance=0.5*iteration)))
+    domain = computePicture(list(X),list(Y),partial(altMandelbrot, idepth=iteration_depth))
 
-    im.save("technicolorMandelbrot.png")
+    coloring = [(mandelColor(z),x,y) for z,x,y in domain]
+
+    for result, x, y in tqdm(coloring):
+        # print(x,y)
+        im.putpixel((x,y), result)
+
+    im.save("newTest.png")
